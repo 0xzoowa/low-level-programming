@@ -16,9 +16,9 @@ q 1 ;1/10 -> r 1 q 0 mov rax, rdi ;move dividend (arg) into rax xor rdx, rdx
 ;zero out high 64 bit mov rcx, 10 ;divisor mov rbx, rsp ;save stack pointer
 .loop: div rcx add rdx, '0' ; transform to ASCII push rdx ;push processed digit
 onto stack xor rdx, rdx ;clear reminder for new iteration test rax, rax jnz
-.loop .print_loop: cmp rbx, rsp je .end pop rdi call print_char ;routine to
-print a char jmp .print_loop .end: ret print_int: xor rax, rax ret
-string_equals: xor rax, rax ret read_char: xor rax, rax ret read_word: ret ; rdi
-points to a string ; returns rax: number, rdx : length parse_uint: xor rax, rax
-ret ; rdi points to a string ; returns rax: number, rdx : length parse_int: xor
-rax, rax ret string_copy: ret
+.loop ;if rax is 0, done processing digits .print_loop: cmp rbx, rsp je .end pop
+rdi call print_char ;routine to print a char jmp .print_loop .end: ret
+print_int: xor rax, rax ret string_equals: xor rax, rax ret read_char: xor rax,
+rax ret read_word: ret ; rdi points to a string ; returns rax: number, rdx :
+length parse_uint: xor rax, rax ret ; rdi points to a string ; returns rax:
+number, rdx : length parse_int: xor rax, rax ret string_copy: ret
