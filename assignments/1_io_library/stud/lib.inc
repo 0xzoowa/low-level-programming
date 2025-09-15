@@ -13,11 +13,11 @@ integer in decimal format. ;q - rax -> unprocessed digits ;r - rdx -> processed
 digit ;divisor any 64-bit register or memory operand (e.g. rcx) ;decimal 112
 ;12345/10 -> r 5 q 1234 ;1234/10 -> r 4 q 123 ;123/10 -> r 3 q 12 ;12/10 -> r 2
 q 1 ;1/10 -> r 1 q 0 mov rax, rdi ;move dividend (arg) into rax xor rdx, rdx
-;zero out high 64 bit mov rcx, 10 ;divisor mov rbx, rsp .loop: div rcx add rdx,
-'0' ; transform to ASCII push rdx ;push processed digit onto stack xor rdx, rdx
-;clear reminder for new iteration test rax, rax jnz .loop mov rdi, rdx ;
-argument to print_char .print_loop: cmp rbx, rsp je .end pop rdi call print_char
-;routine to print a char jmp .print_loop .end: ret print_int: xor rax, rax ret
+;zero out high 64 bit mov rcx, 10 ;divisor mov rbx, rsp ;save stack pointer
+.loop: div rcx add rdx, '0' ; transform to ASCII push rdx ;push processed digit
+onto stack xor rdx, rdx ;clear reminder for new iteration test rax, rax jnz
+.loop .print_loop: cmp rbx, rsp je .end pop rdi call print_char ;routine to
+print a char jmp .print_loop .end: ret print_int: xor rax, rax ret
 string_equals: xor rax, rax ret read_char: xor rax, rax ret read_word: ret ; rdi
 points to a string ; returns rax: number, rdx : length parse_uint: xor rax, rax
 ret ; rdi points to a string ; returns rax: number, rdx : length parse_int: xor
