@@ -36,6 +36,14 @@ rcx, rcx ; counter = 0 mov rbx, rdi ;save buffer mov r8, rsi ;save size .loop:
 call read_char cmp rax, 0 je .done cmp al, ' ' je .continue cmp al, 9 je
 .continue cmp al, 10 je .continue ;check capacity cmp rcx, r8 jae .too_big mov
 [rbx + rcx], al inc rcx jmp .loop .too_big: xor rax, rax ret .continue: cmp rcx,
-0 je .loop jmp .done .done: mov [rbx + rcx], 0 mov rax, rbx ret parse_uint: xor
-rax, rax ret ; rdi points to a string ; returns rax: number, rdx : length
-parse_int: xor rax, rax ret string_copy: ret
+0 je .loop jmp .done .done: mov byte [rbx + rcx], 0 mov rax, rbx ret
+string_copy: ;Accepts a pointer to a string, a pointer to a buffer, and buffer’s
+length. ;Copies string to the destination. The destination address is returned
+if the string fits the buffer; otherwise zero is returned. ;rdi -> pointer to
+string ;rsi -> pointer to buffer ;rdx -> buffer's length xor rcx, rcx ;counter
+-> incremented everytime char is added to buffer mov rbx, rsi ;save dest pointer
+.loop: cmp byte [rdi], 0 je .end cmp rcx, rdx jae .too_small mov r8b, [rdi] mov
+[rsi], r8b inc rcx inc rdi inc rsi jmp .loop .end: mov byte [rsi], 0 ;null
+terminate src string mov rax, rbx ret .too_small: xor rax, rax ret parse_uint:
+xor rax, rax ret ; rdi points to a string ; returns rax: number, rdx : length
+parse_int: xor rax, rax ret
