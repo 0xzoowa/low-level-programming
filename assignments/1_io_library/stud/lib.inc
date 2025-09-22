@@ -24,20 +24,18 @@ mov rbx, rsp .loop: xor rdx, rdx div rcx add rdx, '0' push rdx test rax, rax jnz
 Returns 1 if they are equal, otherwise 0. .loop: cmp byte [rdi], 0 je
 .check_pointer2 cmp byte [rsi], 0 je .false mov al, [rdi] cmp al, [rsi] jne
 .false inc rdi inc rsi jmp .loop .check_pointer2: cmp byte [rsi], 0 je .true jmp
-.false .true: mov rax, 1 ret .false: xor rax, rax ret read_word: ;Accepts a
-buffer address and size as arguments. ;Reads next word from stdin (skipping
-whitespaces into buffer). ;Stops and returns 0 if word is too big for the buffer
-specified; otherwise returns a buffer address. ;This function should
-null-terminate the accepted string. mov rcx, 0 mov rbx, rdi ;buffer address mov
-r8, rsi ;buffer size ;reads stdin into a temporary buffer call .read cmp rax, 0
-je .done xor rdx, rdx mov [uncleaned_input + rax], 0 ;null terminate the
-temporary buffer .next_char_from_buffer: mov al, [uncleaned_input + rdx] ;check
-for null terminator cmp al, 0 je .done ;skip/ignore whitespaces cmp al, ' ' je
-.continue cmp al, 9 je .continue cmp al, 10 je .continue ;check capacity cmp
-rcx, r8 jae .too_big ;save to buffer mov [rbx + rcx], al inc rcx jmp
-.next_char_from_buffer .read: mov rax, 0 mov rdi, 0 mov rsi, uncleaned_input mov
-rdx, r8 ;count -> buffer size syscall ret .too_big: xor rax, rax ret .continue:
-inc rdx jmp .next_char_from_buffer .done: mov byte [rbx + rcx], 0 mov rax, rbx
-ret read_char: xor rax, rax ret parse_uint: xor rax, rax ret ; rdi points to a
-string ; returns rax: number, rdx : length parse_int: xor rax, rax ret
-string_copy: ret
+.false .true: mov rax, 1 ret .false: xor rax, rax ret read_char: ;Read one
+character from stdin and return it. If the end of input stream occurs, return 0.
+mov rax, 0 ;read syscall number mov rdi, 0 ;stdin mov rsi, temp ;buffer mov rdx,
+1 ;count syscall ;execute cmp rax, 0 je .eof movzx rax, byte [temp] ret .eof:
+xor rax, rax ret read_word: ;Accepts a buffer address and size as arguments.
+;Reads next word from stdin (skipping whitespaces into buffer). ;Stops and
+returns 0 if word is too big for the buffer specified; otherwise returns a
+buffer address. ;This function should null-terminate the accepted string. xor
+rcx, rcx ; counter = 0 mov rbx, rdi ;save buffer mov r8, rsi ;save size .loop:
+call read_char cmp rax, 0 je .done cmp al, ' ' je .continue cmp al, 9 je
+.continue cmp al, 10 je .continue ;check capacity cmp rcx, r8 jae .too_big mov
+[rbx + rcx], al inc rcx jmp .loop .too_big: xor rax, rax ret .continue: cmp rcx,
+0 je .loop jmp .done .done: mov [rbx + rcx], 0 mov rax, rbx ret parse_uint: xor
+rax, rax ret ; rdi points to a string ; returns rax: number, rdx : length
+parse_int: xor rax, rax ret string_copy: ret
