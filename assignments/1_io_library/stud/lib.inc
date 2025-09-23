@@ -47,15 +47,15 @@ string ;rsi -> pointer to buffer ;rdx -> buffer's length xor rcx, rcx ;counter
 terminate src string mov rax, rbx ret .too_small: xor rax, rax ret parse_uint:
 ;Accepts a null-terminated string and tries to parse an unsigned number from its
 start. ;Returns the number parsed in rax, its characters count in rdx. xor rcx,
-rcx ;power counter xor rdx, rdx ;character counter xor rax, rax ;accumulator
-;'123\0' ;push 1 rcx 1 ;push 2 rcx 2 ;push 3 rcx 3 .loop: mov al, [rdi] ;1 cmp
-al, 0 je .end ;done processing, return rax -> accumulatotr and rdx -> character
-count cmp al, '0' jb .end cmp al, '9' ja .end mov rbx, rsp ;save stack pointer
-sub al, '0' ;get number representation push al inc rdx jmp .loop .accumulator:
-cmp rsp, rbx je .end cmp rcx, 0 je .handle_zero_power .end: mov rdx, rcx ret
-.handle_power: pop bl mul bl, 10 mul bl, rcx add rax, bl inc rcx jmp
-.accumulator .handle_zero_power: pop bl add rax, bl inc rcx jmp .accumulator ;
-rdi points to a string ; returns rax: number, rdx : length parse_int: ;Accepts a
-null-terminated string and tries to parse a signed number from its start.
-;Returns the number parsed in rax; its characters count in rdx (including sign
-if any). ; No spaces between sign and digits are allowed. xor rax, rax ret
+rcx ;power counter xor rdx, rdx ;character counter xor rax, rax ;accumulator mov
+r8, 1 ;initialize multiplier to 1 mov rbx, rsp ;save stack pointer .loop: mov
+al, [rdi] cmp al, 0 je .accumulator cmp al, '0' jb .end cmp al, '9' ja .end sub
+al, '0' ;get number representation movzx rax, al push rax inc rdx jmp .loop
+.accumulator: cmp rsp, rbx je .end cmp rcx, 0 je .handle_zero_power
+.handle_power: pop r10 mov r9, rcx ; rcx = 1 call .power_loop ;r8 = 10, 100,
+1000 ... imul r10, r8 add rax, r10 inc rcx jmp .accumulator .handle_zero_power:
+pop r10 add rax, r10 inc rcx jmp .accumulator .multiplier: imul r8, 10 dec r9
+jmp .power_loop .power_loop: cmp r9, 0 jnz .multiplier ret .end: ret parse_int:
+;Accepts a null-terminated string and tries to parse a signed number from its
+start. ;Returns the number parsed in rax; its characters count in rdx (including
+sign if any). ; No spaces between sign and digits are allowed. xor rax, rax ret
