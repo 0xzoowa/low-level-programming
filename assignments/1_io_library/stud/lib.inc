@@ -50,12 +50,11 @@ start. ;Returns the number parsed in rax, its characters count in rdx. xor rcx,
 rcx ;power counter xor rdx, rdx ;character counter xor rax, rax ;accumulator mov
 r8, 1 ;initialize multiplier to 1 mov rbx, rsp ;save stack pointer .loop: mov
 al, [rdi] cmp al, 0 je .accumulator cmp al, '0' jb .end cmp al, '9' ja .end sub
-al, '0' ;get number representation movzx rax, al push rax inc rdx jmp .loop
-.accumulator: cmp rsp, rbx je .end cmp rcx, 0 je .handle_zero_power
-.handle_power: pop r10 mov r9, rcx ; rcx = 1 call .power_loop ;r8 = 10, 100,
-1000 ... imul r10, r8 add rax, r10 inc rcx jmp .accumulator .handle_zero_power:
-pop r10 add rax, r10 inc rcx jmp .accumulator .multiplier: imul r8, 10 dec r9
-jmp .power_loop .power_loop: cmp r9, 0 jnz .multiplier ret .end: ret parse_int:
+al, '0' ;get number representation movzx rax, al push rax inc rdx inc rdi jmp
+.loop .accumulator: cmp rsp, rbx je .end cmp rcx, 0 je .handle_zero_power
+.handle_power: pop r10 ;3 ;mov r9, rcx ; rcx = 1 call .power ;r8 = 10 imul r10,
+r8 add rax, r10 inc rcx jmp .accumulator .handle_zero_power: pop r10 add rax,
+r10 inc rcx jmp .accumulator .power: imul r8, 10 ret .end: ret parse_int:
 ;Accepts a null-terminated string and tries to parse a signed number from its
 start. ;Returns the number parsed in rax; its characters count in rdx (including
 sign if any). ; No spaces between sign and digits are allowed. xor rax, rax ret
