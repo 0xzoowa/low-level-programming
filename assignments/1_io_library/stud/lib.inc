@@ -52,10 +52,20 @@ r8, 1 ;initialize multiplier to 1 mov rbx, rsp ;save stack pointer .loop: mov
 r11b, [rdi] cmp r11b, 0 je .accumulator cmp r11b, '0' jb .end cmp r11b, '9' ja
 .end sub r11b, '0' ;get number representation movzx r11, r11b push r11 inc rdx
 inc rdi jmp .loop .accumulator: cmp rsp, rbx je .end cmp rcx, 0 je
-.handle_zero_power .handle_power: pop r10 ;3 ;mov r9, rcx ; rcx = 1 call .power
-;r8 = 10 imul r10, r8 add rax, r10 inc rcx jmp .accumulator .handle_zero_power:
-pop r10 add rax, r10 inc rcx jmp .accumulator .power: imul r8, 10 ret .end: ret
-parse_int: ;Accepts a null-terminated string and tries to parse a signed number
-from its start. ;Returns the number parsed in rax; its characters count in rdx
-(including sign if any). ; No spaces between sign and digits are allowed. xor
-rax, rax ret
+.handle_zero_power .handle_power: pop r10 ;3 call .power ;r8 = 10 imul r10, r8
+add rax, r10 inc rcx jmp .accumulator .handle_zero_power: pop r10 add rax, r10
+inc rcx jmp .accumulator .power: imul r8, 10 ret .end: ret parse_int: ;Accepts a
+null-terminated string and tries to parse a signed number from its start.
+;Returns the number parsed in rax; its characters count in rdx (including sign
+if any). ;No spaces between sign and digits are allowed. ;'-123\0' xor rax, rax
+xor rcx, rcx xor rdx, rdx xor r9, r9 mov r8, 1 mov rbx, rsp .loop: mov r11b,
+[rdi] cmp r11b, 0 je .accumulator ;handle sign cmp r11b, '-' je .handle_negative
+cmp r11b, '+' je .handle_positive cmp r11b, '0' jb .end cmp r11b, '9' ja .end
+sub r11b, '0' movzx r11, r11b push r11 inc rdx inc rdi jmp .loop .accumulator:
+cmp rsp, rbx je .end cmp rcx, 0 je .handle_zero_power .handle_power: pop r10
+call .power imul r10, r8 add rax, r10 inc rcx jmp .accumulator
+.handle_zero_power: pop r10 add rax, r10 inc rcx jmp .accumulator .power: imul
+r8, 10 ret .handle_negative: cmp rdx, 0 jne .end ;reject if first char isnt sign
+mov r9, 1 ;set sign flag inc rdx inc rdi jmp .loop .handle_positive: cmp rdx, 0
+jne .end inc rdx inc rdi jmp .loop .negate_result: neg rax ret .end: cmp r9, 1
+je .negate_result ret
